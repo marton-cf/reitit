@@ -208,9 +208,19 @@
                                              (for [k ks]
                                                (when-let [method-map (get v k)]
                                                  (get-in method-map [:requestBody :content "application/json" :schema :definitions])))))))
-                        {} paths)]
+                        {} paths)
+           paths-without-definitions
+           (update-vals paths
+                        (fn [methods]
+                          (update-vals methods
+                                       (fn [method]
+                                         (update-in method [:requestBody :content]
+                                                    (fn [contents]
+                                                      (update-vals contents
+                                                                   (fn [content]
+                                                                     (update content :schema #(dissoc % :definitions))))))))))]
        {:status 200
-        :body (meta-merge openapi {:paths paths :components {:schemas definitions}})}))
+        :body (meta-merge openapi {:paths paths-without-definitions :components {:schemas definitions}})}))
     ([req res raise]
      (try
        (res (create-openapi req))
