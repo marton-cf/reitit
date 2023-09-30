@@ -208,7 +208,7 @@
                                              (for [k ks]
                                                (when-let [method-map (get v k)]
                                                  (get-in method-map [:requestBody :content "application/json" :schema :definitions])))))))
-                        {} paths)
+                        (sorted-map) paths)
            paths-without-definitions
            (update-vals paths
                         (fn [methods]
